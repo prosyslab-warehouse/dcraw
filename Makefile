@@ -32,5 +32,5 @@ fixdates.o: fixdates.c
 install: dcraw dcparse dcfixdates
 	$(INSTALL) dcraw $(DESTDIR)/usr/bin
 	$(INSTALL) dcraw.1 $(DESTDIR)/usr/share/man/man1
-	$(INSTALL) dcparse $(DESDIR)/usr/bin
+	$(INSTALL) dcparse $(DESTDIR)/usr/bin
 	$(INSTALL) dcfixdates $(DESTDIR)/usr/bin

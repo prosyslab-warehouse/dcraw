@@ -1,0 +1,33 @@
+.\"
+.\" Manpage for dcparse and dcfixdates
+.\" Copyright 2004, Steve King
+.\" This file may be distributed without restriction.
+.\"
+.TH dcparse/dcfixdates 1 "Mar 17, 2005"
+.LO 1
+.SH NAME
+dcparse - Extract embeded thumbnail image and print CIFF/TIFF data to screen
+.br
+dcfixdates - Reset photo file date from that recorded by the camera
+.SH SYNOPSIS
+.B dcparse
+file1.crw file2.crw ...
+.br
+.B dcfixdates
+file1 file2 ...
+.SH DESCRIPTION
+These two utilities read data directly from RAW digital photo files.
+
+.B dcparse
+prints internal CIFF/TIFF data, and creates a file called
+.B <filename>.thumb
+which is generally a JPEG file. The CIFF/TIFF data is technical in nature.
+
+.B dcfixdates
+reads time data, recorded by the camera when the picture was taken, and
+resets the date of the file. For this to work effectively the camera time
+should be set to Universal Time.
+.SH "SEE ALSO"
+dcraw(1)
+.SH AUTHOR
+Written by Steve King for debian.

@@ -8,9 +8,10 @@
    Attention!  Some parts of this program are restricted under the
    terms of the GNU General Public License.  Such code is enclosed
    in "BEGIN GPL BLOCK" and "END GPL BLOCK" declarations.
+   Any code not declared GPL is free for all uses.
 
-   All the code currently under GPL is specific to Foveon cameras.
-   This began in Revision 1.237.
+   Starting in Revision 1.237, the code to support Foveon cameras
+   is under GPL.
 
    To lawfully redistribute dcraw.c, you must either (a) include
    full source code for all executable files containing restricted
@@ -18,8 +19,8 @@
    copy them from an earlier, non-GPL Revision of dcraw.c, or (c)
    purchase a license from the author.
 
-   $Revision: 1.237 $
-   $Date: 2005/03/10 03:48:40 $
+   $Revision: 1.239 $
+   $Date: 2005/03/11 18:47:13 $
  */
 
 #define _GNU_SOURCE
@@ -626,6 +627,13 @@ void CLASS lossless_jpeg_load_raw()
 	  jidx -= 2*1680*jh.high;
 	  row = jidx / 1748;
 	  col = jidx % 1748 + 2*1680;
+	}
+      } else if (raw_width == 3516) {
+	row = jidx / 1758;
+	col = jidx % 1758;
+	if (row >= raw_height) {
+	  row -= raw_height;
+	  col += 1758;
 	}
       } else {
 	row = jidx / raw_width;
@@ -1847,7 +1855,7 @@ void CLASS foveon_interpolate()
     for (j=0; j < 3; j++)
       FORC3 last[i][j] += correct[i][c] * cam_xyz[c][j];
 
-  snprintf (str, 128, "%sRGBNeutral", model2);
+  sprintf (str, "%sRGBNeutral", model2);
   if (foveon_camf_param ("IncludeBlocks", str))
     foveon_fixed (div, 3, str);
   else {
@@ -1897,7 +1905,7 @@ void CLASS foveon_interpolate()
 	  - ddft[0][c][0] ) / 4 - ddft[0][c][1];
   }
   memcpy (black, black+8, sizeof *black*8);
-  memcpy (black+1520, black+1509, sizeof *black*11);
+  memcpy (black+height-11, black+height-22, 11*sizeof *black);
   memcpy (last, black, sizeof last);
 
   for (row=1; row < height-1; row++) {
@@ -1944,7 +1952,7 @@ void CLASS foveon_interpolate()
     frow -= irow;
     for (i=0; i < dim[1]; i++)
       FORC3 sgrow[i][c] = sgain[ irow   *dim[1]+i][c] * (1-frow) +
-			 sgain[(irow+1)*dim[1]+i][c] *    frow;
+			  sgain[(irow+1)*dim[1]+i][c] *    frow;
     for (col=0; col < width; col++) {
       FORC3 {
 	diff = pix[c] - prev[c];
@@ -2840,7 +2848,6 @@ int CLASS parse_tiff_ifd (int base, int level)
       case 50706:			/* DNGVersion */
 	is_dng = 1;
 	if (flip == 7) flip = 4;	/* Adobe didn't read the TIFF spec. */
-	strcat (model, " DNG");
 	break;
       case 50710:			/* CFAPlaneColor */
 	if (len > 4) len = 4;
@@ -3518,13 +3525,13 @@ void CLASS adobe_coeff()
 	{ 9877,-3775,-871,-7613,14807,3072,-1448,1305,7485 } }
   };
   double cc[4][4], cm[4][3], xyz[] = { 1,1,1 };
-  char name[96];
+  char name[130];
   int i, j;
 
   for (i=0; i < 4; i++)
     for (j=0; j < 4; j++)
       cc[i][j] = i == j;
-  snprintf (name, 96, "%s %s", make, model);
+  sprintf (name, "%s %s", make, model);
   for (i=0; i < sizeof table / sizeof *table; i++)
     if (!strncmp (name, table[i].prefix, strlen(table[i].prefix))) {
       for (j=0; j < 12; j++)
@@ -3681,6 +3688,7 @@ nucore:
   i = strlen(make);			/* Remove make from model */
   if (!strncmp (model, make, i++))
     memmove (model, model+i, 64-i);
+  make[63] = model[63] = model2[63] = 0;
 
   if (make[0] == 0) {
     fprintf (stderr, "%s: unsupported file format.\n", ifname);
@@ -3702,6 +3710,7 @@ nucore:
   }
   load_raw = NULL;
   if (is_dng) {
+    strcat (model, " DNG");
     if (!filters)
       colors = tiff_samples;
     if (tiff_data_compression == 1)
@@ -3729,6 +3738,7 @@ nucore:
 
   if (is_foveon) {
     if (height*2 < width) ymag = 2;
+    if (width < height) xmag = 2;
     filters = 0;
     load_raw = foveon_load_raw;
     foveon_coeff();
@@ -3818,18 +3828,23 @@ nucore:
     raw_width  = 3596;
     top_margin  = 12;
     left_margin = 74;
-    height = raw_height - top_margin;
-    width  = raw_width - left_margin;
-    filters = 0x94949494;
+    goto canon_cr2;
   } else if (!strcmp(model,"EOS-1Ds Mark II")) {
     raw_height = 3349;
     raw_width  = 5108;
     top_margin  = 13;
     left_margin = 98;
+    maximum = 0xe80;
+    goto canon_cr2;
+  } else if (!strcmp(model,"EOS DIGITAL REBEL XT")) {
+    raw_height = 2328;
+    raw_width  = 3516;
+    top_margin  = 14;
+    left_margin = 42;
+canon_cr2:
     height = raw_height - top_margin;
     width  = raw_width - left_margin;
     filters = 0x94949494;
-    maximum = 0xe80;
   } else if (!strcmp(model,"EOS D2000C")) {
     black = curve[200];
   } else if (!strcmp(model,"D1")) {
@@ -4729,7 +4744,7 @@ int CLASS main (int argc, char **argv)
   if (argc == 1)
   {
     fprintf (stderr,
-    "\nRaw Photo Decoder \"dcraw\" v7.00"
+    "\nRaw Photo Decoder \"dcraw\" v7.02"
     "\nby Dave Coffin, dcoffin a cybercom o net"
     "\n\nUsage:  %s [options] file1 file2 ...\n"
     "\nValid options:"

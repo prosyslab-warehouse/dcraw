@@ -1,3 +1,12 @@
+dcraw (7.02-1) unstable; urgency=low
+
+  * New upstream version
+  * Fixes a typo in the Makefile which caused dcparse to be installed with an
+    absolute path. (Closes: #300105)
+  * Modified source priority to extra
+
+ -- Steve King <debian@twobit.demon.co.uk>  Sat, 19 Mar 2005 09:26:21 +0000
+
 dcraw (7.00-1) unstable; urgency=low
 
   * New upstream version
