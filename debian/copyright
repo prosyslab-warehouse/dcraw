@@ -1,0 +1,22 @@
+This is a Debian GNU/Linux prepackaged version of dcraw
+It was debianized by Steve King <debian@twobit.demon.co.uk> on
+
+dcraw  code was downloaded from:
+  http://www.cybercom.net/~dcoffin/dcraw/dcraw.c
+  http://www.cybercom.net/~dcoffin/dcraw/dcraw.1
+
+Upstream Authors:
+	Dave Coffin <cybercom dot net user dcoffin>	(dcraw executable)
+
+dcraw Copyright:
+   dcraw.c -- Dave Coffin's raw photo decoder
+   Copyright 1997-2004 by Dave Coffin, dcoffin a cybercom o net
+
+   This is a portable ANSI C program to convert raw image files from
+   any digital camera into PPM format.  TIFF and CIFF parsing are
+   based upon public specifications, but no such documentation is
+   available for the raw sensor data, so writing this program has
+   been an immense effort.
+
+   This code is freely licensed for all uses, commercial and
+   otherwise.  Comments, questions, and encouragement are welcome.
