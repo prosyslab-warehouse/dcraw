@@ -1,16 +1,18 @@
 dcraw for Debian
 ----------------
 
-This is a snapshot of dcraw downloaded on 4th Aug 2004
-dated 2004/07/28
+This is a snapshot of dcraw downloaded on 10th March 2005
+dated 2005/03/10 03:48:40
 
 I personally have a Canon EOS 10D and have found the output from
-dcraw comparable to software supplied by canon (which is for
+dcraw comparable to software supplied by Canon (which is for
 windows only of course).
-Typically, dcraw produces improved contrast images making better
-use of the available dynamic range.
+Typically, I have found, dcraw produces improved contrast images
+making better use of the available dynamic range.
 
 There is also a plugin for the gimp to read raw images directly.
 
- Steve King <debian@twobit.demon.co.uk>
+I have yet to write manual pages for dcparse and dcfixdates
+
+ -- Steve King <debian@twobit.demon.co.uk>
 

@@ -10,7 +10,7 @@ Priority: extra
 Architecture: any
 Depends: ${shlibs:Depends}
 Suggests: gphoto2, netpbm
-Description: Decode raw digital camera images
+Description: decode raw digital camera images
  This utility converts the native (RAW), format of various digital
  cameras into netpbm portable pixmap (.ppm) image.  Supports the
  following models: Canon, Kodak, Olympus, Nikon, Fuji, Minolta and

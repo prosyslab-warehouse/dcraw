@@ -1,9 +1,17 @@
-dcraw (5.88-1.1) unstable; urgency=low
+dcraw (7.00-1) unstable; urgency=low
 
-  * Non-maintainer upload.
-  * debian/control: Removed dependency on libjpeg6b. Closes: #297992.
-  
- -- Lars Wirzenius <liw@iki.fi>  Mon,  7 Mar 2005 02:00:00 +0200
+  * New upstream version
+  * Support for automatically or manually rotating images (if your
+  *  camera has support)
+  * Support for Canon D20 (among others)
+  * Closes: #274603
+  * Modified synopsis to remove initial capital letter
+  * Closes: #293383
+  * Includes the fixdates and parse binaries for reading internal dates
+  *  and retriving thumbnail images from certain files (experts only)
+  * Added /usr/share/doc/dcraw/examples/dcrwap, from D. Coffin's web site
+
+ -- Steve King <debian@twobit.demon.co.uk>  Thu, 10 Mar 2005 22:40:54 +0000
 
 dcraw (5.88-1) unstable; urgency=low
 
