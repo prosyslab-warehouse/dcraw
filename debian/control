@@ -8,7 +8,7 @@ Standards-Version: 3.6.1.1
 Package: dcraw
 Priority: extra
 Architecture: any
-Depends: ${shlibs:Depends}, libjpeg6b
+Depends: ${shlibs:Depends}
 Suggests: gphoto2, netpbm
 Description: Decode raw digital camera images
  This utility converts the native (RAW), format of various digital
