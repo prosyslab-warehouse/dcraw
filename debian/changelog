@@ -1,3 +1,9 @@
+dcraw (7.17-1) unstable; urgency=low
+
+  *  New upstream version (Close: #306606)
+
+ -- Steve King <debian@twobit.demon.co.uk>  Sat, 30 Apr 2005 19:17:37 +0100
+
 dcraw (7.02-1) unstable; urgency=low
 
   * New upstream version
