@@ -1,0 +1,73 @@
+#!/bin/bash
+# Script to get new version, .orig and make packaging changes
+
+PATH=/usr/bin:/bin
+
+set -x
+set -u
+set -e
+
+DCRAWHOME=http://www.cybercom.net/~dcoffin/dcraw/
+WGET=wget
+
+http_proxy=
+export http_proxy
+
+TMPFILE=dcraw.c_new
+TEMPLATEDIR=dcraw-template
+
+# Get the new source
+${WGET} -O ${TMPFILE} ${DCRAWHOME}dcraw.c
+
+# grep for the current version
+NEWVERSION=$(grep -i v[0-9][.][0-9][0-9] ${TMPFILE} | sed -e 's/^.*Raw Photo Decoder.*v\([0-9][.][0-9][0-9]\).*$/\1/')
+
+# Build a working directory
+WORKDIR=dcraw-${NEWVERSION}
+if [-d ${WORKDIR} ]
+then
+  echo "Working directory for current version already exists. stop"
+  exit 0
+fi
+
+rm -rf ${WORKDIR}
+mkdir ${WORKDIR}
+mv ${TMPFILE} ${WORKDIR}/dcraw.c
+
+# Get the other bits and pieces
+cd ${WORKDIR}
+${WGET} ${DCRAWHOME}dcraw.1
+${WGET} ${DCRAWHOME}dcwrap
+${WGET} ${DCRAWHOME}parse.c
+${WGET} ${DCRAWHOME}fixdates.c
+
+cd ..
+
+# Build the .orig tar file
+rm -rf ${WORKDIR}.orig
+cp -a ${WORKDIR} ${WORKDIR}.orig
+
+#tar -cvzf ${WORKDIR}.orig.tar.gz ${WORKDIR}.orig
+#rm -rf ${WORKDIR}.orig
+
+# Build a template directory with apt-get source
+rm -rf ${TEMPLATEDIR}
+mkdir ${TEMPLATEDIR}
+cd ${TEMPLATEDIR}
+apt-get source dcraw
+cd ..
+
+# Copy in the template debian bits and pieces
+cp -a ${TEMPLATEDIR}/dcraw-*/debian ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/dcfixdates.1 ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/dcparse.1 ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/Makefile ${WORKDIR}
+
+# Prep the changelog
+cd ${WORKDIR}
+dch --newversion=${NEWVERSION}-1
+egrep '\$Date: [0-9]{4}/[0-9]+/[0-9]+ [0-9]+:[0-9]+:[0-9]+.*\$$' dcraw.c >> debian/README.Debian
+
+vi debian/README.Debian
+
+dpkg-buildpackage -rfakeroot

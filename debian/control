@@ -2,8 +2,8 @@ Source: dcraw
 Section: graphics
 Priority: extra
 Maintainer: Steve King <debian@twobit.demon.co.uk>
-Build-Depends: debhelper (>> 4.0.0), libjpeg-dev
-Standards-Version: 3.6.1.1
+Build-Depends: debhelper (>= 5.0.0), libjpeg-dev
+Standards-Version: 3.6.2.1
 
 Package: dcraw
 Priority: extra
