@@ -1,5 +1,4 @@
 #!/bin/bash
-# Script to get new version, .orig and make packaging changes
 
 PATH=/usr/bin:/bin
 
@@ -24,7 +23,7 @@ NEWVERSION=$(grep -i v[0-9][.][0-9][0-9] ${TMPFILE} | sed -e 's/^.*Raw Photo Dec
 
 # Build a working directory
 WORKDIR=dcraw-${NEWVERSION}
-if [-d ${WORKDIR} ]
+if [ -d ${WORKDIR} ]
 then
   echo "Working directory for current version already exists. stop"
   exit 0
@@ -37,9 +36,12 @@ mv ${TMPFILE} ${WORKDIR}/dcraw.c
 # Get the other bits and pieces
 cd ${WORKDIR}
 ${WGET} ${DCRAWHOME}dcraw.1
-${WGET} ${DCRAWHOME}dcwrap
+#${WGET} ${DCRAWHOME}dcwrap
 ${WGET} ${DCRAWHOME}parse.c
-${WGET} ${DCRAWHOME}fixdates.c
+#${WGET} ${DCRAWHOME}fixdates.c
+${WGET} ${DCRAWHOME}fujiturn.c
+${WGET} ${DCRAWHOME}fuji_green.c
+${WGET} ${DCRAWHOME}clean_crw.c
 
 cd ..
 

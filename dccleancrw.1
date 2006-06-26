@@ -1,0 +1,28 @@
+.\"
+.\" Manpage for dccleancrw
+.\" Copyright 2006, Steve King
+.\" This file may be distributed without restriction.
+.\"
+.TH dccleancrw 1 "Jun 27, 2006"
+.LO 1
+.SH NAME
+dccleancrw - Canon (CRW) RAW photo file recovery utility
+.br
+.SH SYNOPSIS
+.B dccleancrw
+crw_0001.crw crw_0002.crw ...
+.br
+
+.SH DESCRIPTION
+Because they are parsed from the end, Canon CRW files
+become unreadable if garbage data is appended to them, as
+often happens when files are recovered from damaged media.
+This program truncates CRW files to the correct size.
+.br
+
+.SH "SEE ALSO"
+dcraw(1)
+.SH AUTHOR
+Written by Dave Coffin.
+.br
+man page by Steve King for debian.

@@ -1,0 +1,31 @@
+.\"
+.\" Manpage for dcfujigreen
+.\" Copyright 2006, Steve King
+.\" This file may be distributed without restriction.
+.\"
+.TH dcfujigreen 1 "Jun 27, 2006"
+.LO 1
+.SH NAME
+dcfujigreen - Alternative processing for Fuji RAW images
+.br
+.SH SYNOPSIS
+.B dcfujigreen
+file1 file2
+.br
+
+.SH DESCRIPTION
+Fuji RAW green channel output alternative to dcraw.
+.br
+Fuji digital cameras use a sum/difference encoding for the colour data.
+This means that the green channel is roughly equivalent to a black and
+white image.
+.br
+This utility can be used in place of
+.B dcraw(1)
+to retrieve a black and white image. It is much quicker than dcraw, but is
+doing a lot less.
+
+.SH "SEE ALSO"
+dcraw(1), dcfujiturn(1)
+.SH AUTHOR
+Written by Steve King for debian.

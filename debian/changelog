@@ -1,3 +1,14 @@
+dcraw (8.23-1) unstable; urgency=low
+
+  * Removed substvars
+  * Made compliant to debian-policy 3.7.2.1
+  * Removed build dependancy on libc6-dev
+  * Added fujiturn/fuji_green and clean_crw (Closes: #351364)
+  * New upsream version (Closes: #368856)
+  * Removed dcfixdates, dcwrap (no longer maintained upstream)
+
+ -- Steve King <debian@twobit.demon.co.uk>  Mon, 26 Jun 2006 13:48:05 +0000
+
 dcraw (7.94-1) unstable; urgency=low
 
   * New upstream version (Closes: #341370)
