@@ -19,7 +19,15 @@ TEMPLATEDIR=dcraw-template
 ${WGET} -O ${TMPFILE} ${DCRAWHOME}dcraw.c
 
 # grep for the current version
-NEWVERSION=$(grep -i v[0-9][.][0-9][0-9] ${TMPFILE} | sed -e 's/^.*Raw Photo Decoder.*v\([0-9][.][0-9][0-9]\).*$/\1/')
+#NEWVERSION=$(grep -i v[0-9][.][0-9][0-9] ${TMPFILE} | sed -e 's/^.*Raw Photo Decoder.*v\([0-9][.][0-9][0-9]\).*$/\1/')
+NEWVERSION=$(grep -i '^#define VERSION "[0-9][.][0-9][0-9]"$' ${TMPFILE} | sed -e 's/^#define VERSION "\([0-9][.][0-9][0-9]\)"$/\1/')
+
+if [ -z "${NEWVERSION}" ]
+then
+  echo "error: Could not get new version number"
+  exit 1
+fi
+
 
 # Build a working directory
 WORKDIR=dcraw-${NEWVERSION}
@@ -33,6 +41,8 @@ rm -rf ${WORKDIR}
 mkdir ${WORKDIR}
 mv ${TMPFILE} ${WORKDIR}/dcraw.c
 
+cp "${0}" "${WORKDIR}/getsource"
+
 # Get the other bits and pieces
 cd ${WORKDIR}
 ${WGET} ${DCRAWHOME}dcraw.1
@@ -42,12 +52,15 @@ ${WGET} ${DCRAWHOME}parse.c
 ${WGET} ${DCRAWHOME}fujiturn.c
 ${WGET} ${DCRAWHOME}fuji_green.c
 ${WGET} ${DCRAWHOME}clean_crw.c
+${WGET} ${DCRAWHOME}.badpixels
 
 cd ..
 
 # Build the .orig tar file
 rm -rf ${WORKDIR}.orig
 cp -a ${WORKDIR} ${WORKDIR}.orig
+
+mv ${WORKDIR}/.badpixels ${WORKDIR}/badpixels
 
 #tar -cvzf ${WORKDIR}.orig.tar.gz ${WORKDIR}.orig
 #rm -rf ${WORKDIR}.orig
@@ -61,9 +74,13 @@ cd ..
 
 # Copy in the template debian bits and pieces
 cp -a ${TEMPLATEDIR}/dcraw-*/debian ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/dcfixdates.1 ${WORKDIR}
+#cp -a ${TEMPLATEDIR}/dcraw-*/dcfixdates.1 ${WORKDIR}
 cp -a ${TEMPLATEDIR}/dcraw-*/dcparse.1 ${WORKDIR}
 cp -a ${TEMPLATEDIR}/dcraw-*/Makefile ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/dcfujiturn.1 ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/dcfujiturn16.1 ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/dccleancrw.1 ${WORKDIR}
+cp -a ${TEMPLATEDIR}/dcraw-*/dcfujigreen.1 ${WORKDIR}
 
 # Prep the changelog
 cd ${WORKDIR}
