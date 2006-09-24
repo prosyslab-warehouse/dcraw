@@ -1,8 +1,8 @@
 dcraw for Debian
 ----------------
 
-This is a snapshot of dcraw downloaded on 17 September 2006
-   $Date: 2006/09/12 08:38:59 $
+This is a snapshot of dcraw downloaded on 24 September 2006
+   $Date: 2006/09/19 20:50:11 $
 
 I personally have a Canon EOS 10D and have found the output from
 dcraw comparable to software supplied by Canon (which is for
@@ -16,5 +16,5 @@ I have added "getsource" a script I use to build dcraw. This includes
 the shell code to build the .orig.tar.gz file (this is not distributed
 by the author)
 
- -- Steve King <debian@twobit.demon.co.uk>
+ -- Steve King <debian@invux.com>
 

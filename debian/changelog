@@ -1,3 +1,10 @@
+dcraw (8.39-1) unstable; urgency=low
+
+  * New upstream version
+  * Maintainer email change
+
+ -- Steve King <debian@invux.com>  Sun, 24 Sep 2006 21:27:50 +0100
+
 dcraw (8.38-1) unstable; urgency=low
 
   * New upstream version

@@ -1,7 +1,7 @@
 Source: dcraw
 Section: graphics
 Priority: extra
-Maintainer: Steve King <debian@twobit.demon.co.uk>
+Maintainer: Steve King <debian@invux.com>
 Build-Depends: debhelper (>= 5.0.0), libjpeg-dev, liblcms1-dev
 Standards-Version: 3.7.2.1
 
