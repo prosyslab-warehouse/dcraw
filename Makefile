@@ -3,7 +3,7 @@ CC     = gcc
 INSTALL= /usr/bin/install
 
 # Flags
-CFLAGS = -I. -O3 -g -Wall
+CFLAGS = -I. -O4 -g -Wall
 
 SRC = dcraw.c parse.c fujiturn.c fuji_green.c clean_crw.c
 OBJ = dcraw.o parse.o fujiturn.o fujiturn16.o fuji_green.o clean_crw.o
@@ -12,22 +12,22 @@ OBJ = dcraw.o parse.o fujiturn.o fujiturn16.o fuji_green.o clean_crw.o
 default: dcraw dcparse dcfujiturn dcfujiturn16 dcfujigreen dccleancrw
 
 dcraw: dcraw.o
-	$(CC) -s -o $@ dcraw.o -lm -ljpeg -llcms
+	$(CC) -o $@ dcraw.o -lm -ljpeg -llcms
 
 dcparse: parse.o
-	$(CC) -s -o $@ parse.o
+	$(CC) -o $@ parse.o
 
 dcfujiturn: fujiturn.o
-	$(CC) -s -o $@ fujiturn.o
+	$(CC) -o $@ fujiturn.o
 
 dcfujiturn16: fujiturn16.o
-	$(CC) -s -o $@ fujiturn16.o
+	$(CC) -o $@ fujiturn16.o
 
 dcfujigreen: fuji_green.o
-	$(CC) -s -o $@ fuji_green.o -lm
+	$(CC) -o $@ fuji_green.o -lm
 
 dccleancrw: clean_crw.o
-	$(CC) -s -o $@ clean_crw.o
+	$(CC) -o $@ clean_crw.o
 
 clean:
 	rm -f core *.o

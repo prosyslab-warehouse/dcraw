@@ -1,3 +1,16 @@
+dcraw (8.80-1) unstable; urgency=low
+
+  * Modified Makefile: -O4 instead of -03
+  * Modified Makefile: removed "-s" flag from $(CC) lines
+  * Closes: #411920
+  * Closes: #436707
+  * Now distributed under a different license
+  * Closes: #431883
+  * Closes: #424663
+  * New upstream version
+
+ -- Steve King <debian@invux.com>  Wed, 14 Nov 2007 10:01:57 +0000
+
 dcraw (8.39-1) unstable; urgency=low
 
   * New upstream version
