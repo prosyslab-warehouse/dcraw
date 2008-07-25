@@ -1,3 +1,11 @@
+dcraw (8.86-1) unstable; urgency=low
+
+  * New upstream version. (Closes: #489931)
+  * Remove .LO lines from man pages
+  * Added Homepage reference to source stanza
+
+ -- Steve King <debian@invux.com>  Fri, 25 Jul 2008 09:58:25 +0100
+
 dcraw (8.80-1) unstable; urgency=low
 
   * Modified Makefile: -O4 instead of -03

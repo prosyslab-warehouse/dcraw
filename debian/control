@@ -3,7 +3,8 @@ Section: graphics
 Priority: extra
 Maintainer: Steve King <debian@invux.com>
 Build-Depends: debhelper (>= 5.0.0), libjpeg-dev, liblcms1-dev
-Standards-Version: 3.7.2.1
+Standards-Version: 3.8.0.1
+Homepage: http://www.cybercom.net/~dcoffin/dcraw/
 
 Package: dcraw
 Priority: extra
