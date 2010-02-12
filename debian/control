@@ -3,13 +3,13 @@ Section: graphics
 Priority: extra
 Maintainer: Steve King <debian@invux.com>
 Build-Depends: debhelper (>= 5.0.0), libjpeg-dev, liblcms1-dev
-Standards-Version: 3.8.0.1
+Standards-Version: 3.8.4
 Homepage: http://www.cybercom.net/~dcoffin/dcraw/
 
 Package: dcraw
 Priority: extra
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: gphoto2, netpbm
 Description: decode raw digital camera images
  This utility converts the native (RAW), format of various digital

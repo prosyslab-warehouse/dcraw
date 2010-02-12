@@ -1,3 +1,9 @@
+dcraw (8.99-1) unstable; urgency=low
+
+  * New upstream version. (Closes: #506705, #523789, #519604) 
+
+ -- Steve King <debian@invux.com>  Fri, 12 Feb 2010 14:29:24 +0000
+
 dcraw (8.86-1) unstable; urgency=low
 
   * New upstream version. (Closes: #489931)

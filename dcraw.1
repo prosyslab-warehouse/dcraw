@@ -1,7 +1,7 @@
 .\"
 .\" Man page for dcraw
 .\"
-.\" Copyright (c) 2008 by David Coffin
+.\" Copyright (c) 2009 by David Coffin
 .\"
 .\" You may distribute without restriction.
 .\"
@@ -9,7 +9,7 @@
 .\" dcoffin a cybercom o net
 .\" http://www.cybercom.net/~dcoffin
 .\"
-.TH dcraw 1 "February 6, 2008"
+.TH dcraw 1 "May 14, 2009"
 .SH NAME
 dcraw - command-line decoder for raw digital photos
 .SH SYNOPSIS
@@ -212,8 +212,19 @@ Use a fixed white level, ignoring the image histogram.
 .B -b brightness
 Divide the white level by this number, 1.0 by default.
 .TP
+.B -g power toe_slope
+Set the gamma curve, by default BT.709
+.RB ( -g\ 2.222\ 4.5 ).
+If you prefer sRGB gamma, use
+.BR -g\ 2.4\ 12.92 .
+For a simple power curve, set the toe slope to zero.
+.TP
+.B -6
+Write sixteen bits per sample instead of eight.
+.TP
 .B -4
-Write 16-bit linear samples (fixed white level, no gamma).
+Linear 16-bit, same as
+.BR -6\ -W\ -g\ 1\ 1 .
 .TP
 .B -T
 Write TIFF with metadata instead of PGM/PPM/PAM.
