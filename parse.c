@@ -1,12 +1,12 @@
 /*
    Raw Photo Parser
-   Copyright 2004-2006 by Dave Coffin, dcoffin a cybercom o net
+   Copyright 2004-2010 by Dave Coffin, dcoffin a cybercom o net
 
    This program displays raw metadata for all raw photo formats.
    It is free for all uses.
 
-   $Revision: 1.69 $
-   $Date: 2009/08/28 22:52:20 $
+   $Revision: 1.74 $
+   $Date: 2012/01/24 07:15:43 $
  */
 
 #include <stdio.h>
@@ -87,6 +87,42 @@ double get_double()
   for (i=0; i < 8; i++)
     u.c[i ^ rev] = fgetc(ifp);
   return u.d;
+}
+
+unsigned getbithuff (int nbits, const ushort *huff)
+{
+  static unsigned bitbuf=0;
+  static int vbits=0, reset=0;
+  unsigned c;
+
+  if (nbits == -1)
+    return bitbuf = vbits = reset = 0;
+  if (nbits == 0 || vbits < 0) return 0;
+  while (vbits < nbits && (c = fgetc(ifp)) != EOF) {
+    bitbuf = (bitbuf << 8) + (uchar) c;
+    vbits += 8;
+  }
+  c = bitbuf << (32-vbits) >> (32-nbits);
+  if (huff) {
+    vbits -= huff[c] >> 8;
+    c = (uchar) huff[c];
+  } else
+    vbits -= nbits;
+  return c;
+}
+
+#define getbits(n) getbithuff(n,0)
+#define gethuff(h) getbithuff(*h,h+1)
+
+int ljpeg_diff (ushort *huff)
+{
+  int len, diff;
+
+  len = gethuff(huff);
+  diff = getbits(len);
+  if ((diff & (1 << (len-1))) == 0)
+    diff -= (1 << len) - 1;
+  return diff;
 }
 
 void tiff_dump(int base, int tag, int type, int count, int level)
@@ -221,26 +257,31 @@ void parse_makernote (int base, int level)
   } else if (!strcmp (buf,"OLYMPUS")) {
     base = ftell(ifp)-10;
     fseek (ifp, -2, SEEK_CUR);
-    order = get2();
-    val = get2();
-  } else if (!strncmp (buf,"FUJIFILM",8) ||
-	     !strncmp (buf,"SONY",4) ||
+    order = get2();  get2();
+  } else if (!strncmp (buf,"SONY",4) ||
 	     !strcmp  (buf,"Panasonic")) {
-    order = 0x4949;
+    goto nf;
+  } else if (!strncmp (buf,"FUJIFILM",8)) {
+    base = ftell(ifp)-10;
+nf: order = 0x4949;
     fseek (ifp,  2, SEEK_CUR);
   } else if (!strcmp (buf,"OLYMP") ||
 	     !strcmp (buf,"LEICA") ||
 	     !strcmp (buf,"Ricoh") ||
 	     !strcmp (buf,"EPSON"))
     fseek (ifp, -2, SEEK_CUR);
-  else if (!strcmp (buf,"AOC"))
+  else if (!strcmp (buf,"AOC") ||
+	   !strcmp (buf,"QVC"))
     fseek (ifp, -4, SEEK_CUR);
-  else
+  else {
     fseek (ifp, -10, SEEK_CUR);
+    if (!strncmp(make,"SAMSUNG",7))
+      base = ftell(ifp);
+  }
 
   entries = get2();
   if (entries > 127) return;
-  puts("  MakerNote:");
+  printf ("%*sMakerNote:\n", level*2-2, "");
   while (entries--) {
     save = ftell(ifp);
     tag  = get2();
@@ -285,7 +326,7 @@ void parse_exif (int base, int level)
 {
   int entries, tag, type, count, save;
 
-  puts("EXIF table:");
+  printf ("%*sEXIF table:\n", level*2-2, "");
   entries = get2();
   while (entries--) {
     save = ftell(ifp);
@@ -300,6 +341,20 @@ void parse_exif (int base, int level)
 }
 
 void parse_mos(int level);
+void parse_minolta (int base);
+void parse_tiff (int base, int level);
+
+void parse_thumb (int base, int level)
+{
+  int i=order;
+  order = 0x4d4d;
+  fseek (ifp, base, SEEK_SET);
+  if (get4()==0xffd8ffe1 && get2() && get4()==0x45786966 && !get2()) {
+    printf ("%*sEmbedded JPEG:\n", level*2, "");
+    parse_tiff (ftell(ifp), level+1);
+  }
+  order = i;
+}
 
 void sony_decrypt (unsigned *data, int len, int start, int key)
 {
@@ -334,17 +389,18 @@ int parse_tiff_ifd (int base, int level)
     slen = count;
     if (slen > 128) slen = 128;
     tiff_dump (base, tag, type, count, level);
+    if (type == 13) tag = 0x14a;
     switch (tag) {
-      case 0x10f:			/* Make tag */
+      case 271:				/* Make tag */
 	fgets (make, slen, ifp);
 	break;
-      case 0x110:			/* Model tag */
+      case 272:				/* Model tag */
 	fgets (model, slen, ifp);
 	break;
       case 33405:			/* Model2 tag */
 	fgets (model2, slen, ifp);
 	break;
-      case 0x14a:			/* SubIFD tag */
+      case 330:				/* SubIFD tag */
 	save2 = ftell(ifp);
 	for (i=0; i < count; i++) {
 	  printf ("SubIFD #%d:\n", i+1);
@@ -353,9 +409,19 @@ int parse_tiff_ifd (int base, int level)
 	  parse_tiff_ifd (base, level+1);
 	}
 	break;
+      case 273:				/* StripOffset */
+      case 513:				/* JpegIFOffset */
+      case 61447:
+	fseek (ifp, get4()+base, SEEK_SET);
+      case 46:
+	parse_thumb (ftell(ifp), level);
+	break;
       case 29184: sony_offset = get4();  break;
       case 29185: sony_length = get4();  break;
       case 29217: sony_key    = get4();  break;
+      case 29264:
+	parse_minolta (ftell(ifp));
+	break;
       case 33424:
       case 65024:
 	puts("Kodak private data:");
@@ -379,16 +445,16 @@ int parse_tiff_ifd (int base, int level)
 	save2 = ftell(ifp);
 	order = get2();
 	fseek (ifp, save2 + (get2(),get4()), SEEK_SET);
-	parse_tiff_ifd (save2, level+1);	
+	parse_tiff_ifd (save2, level+1);
 	order = i;
 	break;
       case 50706:
 	is_dng = 1;
 	break;
       case 50740:
-	if (count != 4 || type != 1) break;
-	puts("Sony SR2 private IFD:");
-	fseek (ifp, get4()+base, SEEK_SET);
+	if (is_dng) break;
+	parse_minolta (i = get4()+base);
+	fseek (ifp, i, SEEK_SET);
 	parse_tiff_ifd (base, level+1);
     }
     fseek (ifp, save+12, SEEK_SET);
@@ -414,9 +480,9 @@ int parse_tiff_ifd (int base, int level)
 /*
    Parse a TIFF file looking for camera model and decompress offsets.
  */
-void parse_tiff (int base)
+void parse_tiff (int base, int level)
 {
-  int doff, ifd=0;
+  int doff, ifd=0, sorder=order;
 
   fseek (ifp, base, SEEK_SET);
   order = get2();
@@ -424,25 +490,32 @@ void parse_tiff (int base)
   get2();
   while ((doff = get4())) {
     fseek (ifp, doff+base, SEEK_SET);
-    printf ("IFD #%d:\n", ifd++);
-    if (parse_tiff_ifd (base, 0)) break;
+    printf ("%*sIFD #%d:\n", level*2, "", ifd++);
+    if (parse_tiff_ifd (base, level)) break;
   }
+  order = sorder;
 }
 
-void parse_minolta()
+void parse_minolta (int base)
 {
-  int data_offset, save, tag, len;
+  unsigned offset, save, len, j;
+  char tag[4];
 
-  fseek (ifp, 4, SEEK_SET);
-  data_offset = get4() + 8;
-  while ((save=ftell(ifp)) < data_offset) {
-    tag = get4();
+  fseek (ifp, base, SEEK_SET);
+  if (fgetc(ifp) || fgetc(ifp)-'M' || fgetc(ifp)-'R') return;
+  order = fgetc(ifp) * 0x101;
+  offset = base + get4() + 8;
+  while ((save=ftell(ifp)) < offset) {
+    fread (tag, 1, 4, ifp);
     len = get4();
-    printf ("Tag %c%c%c offset %06x length %06x\n",
-	tag>>16, tag>>8, tag, save, len);
-    switch (tag) {
-      case 0x545457:				/* TTW */
-	parse_tiff (ftell(ifp));
+    printf ("Minolta tag %3.3s offset %06x length %06x", tag+1, save, len);
+    if (!strncmp (tag+1,"TTW",3)) {
+      putchar ('\n');
+      parse_tiff (ftell(ifp),0);
+    } else {
+      for (j = 0; j < len/2 && j < 128; j++)
+        printf ("%c%04x",(j & 15) || len < 9 ? ' ':'\n', get2());
+      putchar ('\n');
     }
     fseek (ifp, save+len+8, SEEK_SET);
   }
@@ -542,7 +615,7 @@ int parse_jpeg (int offset)
     hlen  = get4();
     if (get4() == 0x48454150)		/* "HEAP" */
       parse_ciff (save+hlen, len-hlen, 0);
-    parse_tiff (save+6);
+    parse_tiff (save+6,0);
     fseek (ifp, save+len, SEEK_SET);
   }
   return 1;
@@ -655,8 +728,9 @@ void get_utf8 (int offset, char *buf, int len)
 void parse_foveon()
 {
   unsigned entries, off, len, tag, save, i, j, k, pent, poff[256][2];
-  char name[128], value[128], camf[0x20000], *pos, *cp, *dp;
-  unsigned val, key, type, num, ndim, dim[3];
+  char name[128], value[128], *camf, *pos, *cp, *dp;
+  unsigned val, wide, high, row, col, diff, type, num, ndim, dim[3];
+  ushort huff[258], vpred[2][2], hpred[2];
 
   order = 0x4949;			/* Little-endian */
   fseek (ifp, -4, SEEK_END);
@@ -693,26 +767,51 @@ void parse_foveon()
 	order = 0x4949;
 	break;
       case 0x464d4143:			/* CAMF */
-	printf ("type %d, ", get4());
-	get4();
-	for (i=0; i < 4; i++)
-	  putchar(fgetc(ifp));
-	val = get4();
-	printf (" version %d.%d:\n",val >> 16, val & 0xffff);
-	key = get4();
-	if ((len -= 28) > 0x20000)
-	  len = 0x20000;
-	fread (camf, 1, len, ifp);
-	for (i=0; i < len; i++) {
-	  key = (key * 1597 + 51749) % 244944;
-	  val = key * (INT64) 301593171 >> 24;
-	  camf[i] ^= ((((key << 8) - val) >> 1) + val) >> 17;
+	type = get4();
+	printf ("type %d\n", type);
+	get4(); get4();
+	wide = get4();
+	high = get4();
+	if (type == 2) {
+	  camf = malloc (len -= 28);
+	  fread (camf, 1, len, ifp);
+	  for (i=0; i < len; i++) {
+	    high = (high * 1597 + 51749) % 244944;
+	    val = high * (INT64) 301593171 >> 24;
+	    camf[i] ^= ((((high << 8) - val) >> 1) + val) >> 17;
+	  }
+	} else if (type == 4) {
+	  camf = malloc (len = wide*high*3/2);
+	  memset (huff, 0xff, sizeof huff);
+	  huff[0] = 8;
+	  for (i=0; i < 13; i++) {
+	    tag = getc(ifp);
+	    val = getc(ifp);
+	    for (j=0; j < 256 >> tag; )
+	      huff[val+ ++j] = tag << 8 | i;
+	  }
+	  fseek (ifp, 6, SEEK_CUR);
+	  getbits(-1);
+	  vpred[0][0] = vpred[0][1] =
+	  vpred[1][0] = vpred[1][1] = 512;
+	  for (j=row=0; row < high; row++) {
+	    for (col=0; col < wide; col++) {
+	      diff = ljpeg_diff(huff);
+	      if (col < 2) hpred[col] = vpred[row & 1][col] += diff;
+	      else         hpred[col & 1] += diff;
+	      if (col & 1) {
+		camf[j++] = hpred[0] >> 4;
+		camf[j++] = hpred[0] << 4 | hpred[1] >> 8;
+		camf[j++] = hpred[1];
+	      }
+	    }
+	  }
+	} else {
+	  printf ("Unknown CAMF type %d\n", type);
+	  break;
 	}
 	for (pos=camf; (unsigned) (pos-camf) < len; pos += sget4(pos+8)) {
-	  if (strncmp (pos, "CMb", 3)) {
-	    printf("Bad CAMF tag \"%.4s\"\n", pos);
-	    break;
-	  }
+	  if (strncmp (pos, "CMb", 3)) goto done;
 	  val = sget4(pos+4);
 	  printf ("  %4.4s version %d.%d: ", pos, val >> 16, val & 0xffff);
 	  switch (pos[3]) {
@@ -775,6 +874,7 @@ void parse_foveon()
 	      printf ("\n");
 	  }
 	}
+done:	free (camf);
 	break;
       case 0x504f5250:			/* PROP */
 	printf ("entries %d, ", pent=get4());
@@ -805,7 +905,7 @@ void parse_fuji (int offset)
 
   fseek (ifp, offset, SEEK_SET);
   if (!(len = get4())) return;
-  printf ("Fuji table at %d:\n",len);
+  printf ("Fuji Image %c:\n", offset < 100 ? 'S':'R');
   fseek (ifp, len, SEEK_SET);
   entries = get4();
   if (entries > 255) return;
@@ -957,24 +1057,30 @@ void identify()
   if ((cp = memmem (head, 32, "MMMM", 4)) ||
       (cp = memmem (head, 32, "IIII", 4))) {
     parse_phase_one (cp-head);
-    if (cp-head) parse_tiff (0);
+    if (cp-head) parse_tiff (0,0);
   } else if (order == 0x4949 || order == 0x4d4d) {
     if (!memcmp(head+6,"HEAPCCDR",8)) {
       parse_ciff (hlen, fsize - hlen, 0);
       fseek (ifp, hlen, SEEK_SET);
     } else
-      parse_tiff (0);
+      parse_tiff (0,0);
   } else if (!memcmp (head,"NDF0",4)) {
-    parse_tiff (12);
+    parse_tiff (12,0);
   } else if (!memcmp (head,"\0MRM",4)) {
-    parse_minolta();
+    parse_minolta (0);
   } else if (!memcmp (head,"FUJIFILM",8)) {
     fseek (ifp, 84, SEEK_SET);
     toff = get4();
     tlen = get4();
     parse_fuji (92);
-    if (toff > 120) parse_fuji (120);
-    parse_tiff (toff+12);
+    fseek (ifp, 100, SEEK_SET);
+    parse_tiff (get4(),0);
+    if (toff > 120) {
+      parse_fuji (120);
+      fseek (ifp, 128, SEEK_SET);
+      parse_tiff (get4(),0);
+    }
+    parse_thumb (toff,0);
   } else if (!memcmp (head,"RIFF",4)) {
     fseek (ifp, 0, SEEK_SET);
     parse_riff(0);

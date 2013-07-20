@@ -1,6 +1,35 @@
+dcraw (9.19-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * New upstream release (Closes: #617543)
+  * Use Autoconf for the build system
+  * Clean up debian/rules
+  * depend on debhelper >= 9, to fix a lintian warning
+  * Switch to 3.0 (quilt); all previous patches
+    are in a single patch
+  * Convert copyright file to DEB-5 format
+  * Increase debian/format to '9', no changes
+  * Enable hardening compiler flags
+  * Properly escape 'minus' signs in man page dcfujiturn.1
+  * Remove compiler flag -include netinet/in.h from fuji_green.c.
+    Apparently it is not needed.
+  * Update to standards version 3.9.4: no changes
+  * Add targets build-arch and build-indep. They are not actually
+    needed, and hence only forward to build-stamp
+  * debian/control: remove Priority field for the binary package,
+    it is inherited from the source package
+  * Build-depend on libjasper-dev
+  * Move getsource script from orig.tar.gz into debian directory,
+     because it is not from upstream
+  * Fix code in getsource that parses upstream version number
+  * Remove example file 'badpixels'
+  * Updated README.Debian
+
+ -- Oliver Sander <sander@igpm.rwth-aachen.de>  Sat, 20 Jul 2013 18:35:51 +0200
+
 dcraw (8.99-1) unstable; urgency=low
 
-  * New upstream version. (Closes: #506705, #523789, #519604) 
+  * New upstream version. (Closes: #506705, #523789, #519604)
 
  -- Steve King <debian@invux.com>  Fri, 12 Feb 2010 14:29:24 +0000
 
@@ -184,7 +213,7 @@ dcraw (4.88-1) unstable; urgency=low
   * Upstream update
 
  -- Steve King <debian@twobit.demon.co.uk>  Tue, 29 Jul 2003 21:56:12 +0100
- 
+
 dcraw (4.87-1) unstable; urgency=low
 
   * Initial Release.

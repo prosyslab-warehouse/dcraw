@@ -1,0 +1,64 @@
+Add configure.in and Makefile.in for a rudimentary AutoTools build system
+
+--- /dev/null
++++ b/Makefile.in
+@@ -0,0 +1,43 @@
++#! /bin/sh
++
++SHELL = /bin/sh
++INSTALL= /usr/bin/install
++CC = @CC@
++CFLAGS = -I@srcdir@ @CFLAGS@
++CPPFLAGS = @CPPFLAGS@
++LDFLAGS = @LDFLAGS@
++LIBOBJS = @LIBOBJS@
++.SUFFIXES:
++.SUFFIXES: .c .o
++
++OBJ = dcraw.o parse.o fujiturn.o fujiturn16.o fuji_green.o clean_crw.o @LIBOBJS@
++
++all: $(OBJ)
++	$(CC) @LDFLAGS@  -ljpeg -llcms -ljasper -o dcraw dcraw.o @LIBS@
++	$(CC) @LDFLAGS@  -o dcparse parse.o @LIBS@
++	$(CC) @LDFLAGS@  -o dcfujiturn fujiturn.o @LIBS@
++	$(CC) @LDFLAGS@  -o dcfujiturn16 fujiturn16.o @LIBS@
++	$(CC) @LDFLAGS@  -o dcfujigreen fuji_green.o @LIBS@
++	$(CC) @LDFLAGS@  -o dccleancrw clean_crw.o @LIBS@
++
++fujiturn16.o: fujiturn.c
++	$(CC) @CFLAGS@ @CPPFLAGS@ -c -D_16BIT -o $@ fujiturn.c
++
++fuji_green.o: fuji_green.c
++#	$(CC) @CFLAGS@ @CPPFLAGS@ -c -include netinet/in.h -o $@ fuji_green.c
++	$(CC) @CFLAGS@ @CPPFLAGS@ -c -o $@ fuji_green.c
++
++clean:
++	rm -f $(OBJ)
++	rm -f config.h config.log config.status\
++	      config.cache
++	rm -f dcraw dcparse dcfujiturn dcfujigreen dccleancrw
++	rm -f dcfujiturn16
++
++install: dcraw dcparse dcfujiturn dcfujiturn16 dcfujigreen dccleancrw
++	$(INSTALL) dcraw $(DESTDIR)/usr/bin
++	$(INSTALL) dcparse $(DESTDIR)/usr/bin
++	$(INSTALL) dcfujiturn $(DESTDIR)/usr/bin
++	$(INSTALL) dcfujiturn16 $(DESTDIR)/usr/bin
++	$(INSTALL) dcfujigreen $(DESTDIR)/usr/bin
++	$(INSTALL) dccleancrw $(DESTDIR)/usr/bin
+--- /dev/null
++++ b/configure.in
+@@ -0,0 +1,13 @@
++dnl Process this file with autoconf to produce a configure script.
++AC_INIT(dcraw.c)
++
++dnl Checks for programs.
++AC_PROG_CC
++
++dnl Checks for libraries.
++AC_CHECK_LIB(m, main)
++
++dnl AC_CHECK_FUNC(getopt_long, , [LIBOBJS="$LIBOBJS getopt.o getopt1.o"])
++dnl AC_SUBST(LIBOBJS)dnl
++
++AC_OUTPUT(Makefile)

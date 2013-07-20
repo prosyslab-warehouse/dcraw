@@ -20,7 +20,7 @@ ${WGET} -O ${TMPFILE} ${DCRAWHOME}dcraw.c
 
 # grep for the current version
 #NEWVERSION=$(grep -i v[0-9][.][0-9][0-9] ${TMPFILE} | sed -e 's/^.*Raw Photo Decoder.*v\([0-9][.][0-9][0-9]\).*$/\1/')
-NEWVERSION=$(grep -i '^#define VERSION "[0-9][.][0-9][0-9]"$' ${TMPFILE} | sed -e 's/^#define VERSION "\([0-9][.][0-9][0-9]\)"$/\1/')
+NEWVERSION=$(grep -i '^#define DCRAW_VERSION "[0-9][.][0-9][0-9]"$' ${TMPFILE} | sed -e 's/^#define DCRAW_VERSION "\([0-9][.][0-9][0-9]\)"$/\1/')
 
 if [ -z "${NEWVERSION}" ]
 then
