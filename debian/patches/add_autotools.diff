@@ -18,7 +18,7 @@ Add configure.in and Makefile.in for a rudimentary AutoTools build system
 +OBJ = dcraw.o parse.o fujiturn.o fujiturn16.o fuji_green.o clean_crw.o @LIBOBJS@
 +
 +all: $(OBJ)
-+	$(CC) @LDFLAGS@  -ljpeg -llcms -ljasper -o dcraw dcraw.o @LIBS@
++	$(CC) @LDFLAGS@  -o dcraw dcraw.o -ljpeg -llcms2 -ljasper @LIBS@
 +	$(CC) @LDFLAGS@  -o dcparse parse.o @LIBS@
 +	$(CC) @LDFLAGS@  -o dcfujiturn fujiturn.o @LIBS@
 +	$(CC) @LDFLAGS@  -o dcfujiturn16 fujiturn16.o @LIBS@
