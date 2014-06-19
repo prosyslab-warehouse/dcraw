@@ -1,9 +1,16 @@
+dcraw (9.21-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Upload to unstable.
+
+ -- Andreas Metzler <ametzler@debian.org>  Thu, 19 Jun 2014 07:52:40 +0200
+
 dcraw (9.21-0.1) experimental; urgency=medium
 
   * Non-maintainer upload.
   * New upstream version. Closes: #743597
   * New upstream has lcms2 support, update add_autotools.diff and b-d to
-    use it. Closes: #743598
+    use it. Closes: #743598    LP: #885324
   * Sync from Ubuntu: Adjust autotools patch to work with ld --as-needed.
     (Thanks, Micah Gersten) Closes: #717471
 
