@@ -1,3 +1,9 @@
+dcraw (9.26-2) UNRELEASED; urgency=medium
+
+  * dccleancrw: Patch to bail out if file cannot be opened. Closes: #715777
+
+ -- Tobias Frost <tobi@debian.org>  Sat, 30 Apr 2016 23:46:28 +0200
+
 dcraw (9.26-1) unstable; urgency=medium
 
   * QA upload.
