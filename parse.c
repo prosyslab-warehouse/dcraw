@@ -5,8 +5,8 @@
    This program displays raw metadata for all raw photo formats.
    It is free for all uses.
 
-   $Revision: 1.62 $
-   $Date: 2006/08/18 02:51:53 $
+   $Revision: 1.65 $
+   $Date: 2007/05/15 06:16:12 $
  */
 
 #include <stdio.h>
@@ -198,7 +198,7 @@ void nikon_decrypt (uchar ci, uchar cj, int tag, int i, int size, uchar *buf)
 
 int parse_tiff_ifd (int base, int level);
 
-void parse_makernote (base)
+void parse_makernote (int base, int level)
 {
   int offset=0, entries, tag, type, count, val, save;
   unsigned serial=0, key=0;
@@ -218,6 +218,11 @@ void parse_makernote (base)
     val = get2();		/* should be 42 decimal */
     offset = get4();
     fseek (ifp, offset-8, SEEK_CUR);
+  } else if (!strcmp (buf,"OLYMPUS")) {
+    base = ftell(ifp)-10;
+    fseek (ifp, -2, SEEK_CUR);
+    order = get2();
+    val = get2();
   } else if (!strncmp (buf,"FUJIFILM",8) ||
 	     !strncmp (buf,"SONY",4) ||
 	     !strcmp  (buf,"Panasonic")) {
@@ -241,9 +246,13 @@ void parse_makernote (base)
     tag  = get2();
     type = get2();
     count= get4();
-    tiff_dump (base, tag, type, count, 2);
+    tiff_dump (base, tag, type, count, level);
+    if ((tag == 0x11 && !strncmp(make,"NIKON",5)) || type == 13) {
+      fseek (ifp, get4()+base, SEEK_SET);
+      parse_tiff_ifd (base, level+1);
+    }
     if (tag == 0x1d)
-      while ((val = fgetc(ifp)))
+      while ((val = fgetc(ifp)) && val != EOF)
 	serial = serial*10 + (isdigit(val) ? val - '0' : val % 10);
     if (tag == 0x91)
       fread (buf91, sizeof buf91, 1, ifp);
@@ -254,12 +263,12 @@ void parse_makernote (base)
     if (tag == 0xa7)
       key = fgetc(ifp)^fgetc(ifp)^fgetc(ifp)^fgetc(ifp);
     if (!strcmp (buf,"OLYMP") && tag >> 8 == 0x20)
-      parse_tiff_ifd (base, 3);
+      parse_tiff_ifd (base, level+1);
     if (tag == 0xe01)
       parse_nikon_capture_note (count);
     if (tag == 0xb028) {
       fseek (ifp, get4(), SEEK_SET);
-      parse_tiff_ifd (base, 3);
+      parse_tiff_ifd (base, level+1);
     }
     fseek (ifp, save+12, SEEK_SET);
   }
@@ -272,7 +281,7 @@ void parse_makernote (base)
   order = sorder;
 }
 
-void parse_exif(int base)
+void parse_exif (int base, int level)
 {
   int entries, tag, type, count, save;
 
@@ -283,9 +292,9 @@ void parse_exif(int base)
     tag  = get2();
     type = get2();
     count= get4();
-    tiff_dump (base, tag, type, count, 1);
+    tiff_dump (base, tag, type, count, level);
     if (tag == 0x927c)
-      parse_makernote (base);
+      parse_makernote (base, level+1);
     fseek (ifp, save+12, SEEK_SET);
   }
 }
@@ -357,7 +366,15 @@ int parse_tiff_ifd (int base, int level)
 	break;
       case 34665:
 	fseek (ifp, get4()+base, SEEK_SET);
-	parse_exif (base);
+	parse_exif (base, level+1);
+	break;
+      case 50459:
+	i = order;
+	save2 = ftell(ifp);
+	order = get2();
+	fseek (ifp, save2 + (get2(),get4()), SEEK_SET);
+	parse_tiff_ifd (save2, level+1);	
+	order = i;
 	break;
       case 50706:
 	is_dng = 1;
@@ -631,7 +648,7 @@ void get_utf8 (int offset, char *buf, int len)
 
 void parse_foveon()
 {
-  int entries, off, len, tag, save, i, j, k, pent, poff[256][2];
+  unsigned entries, off, len, tag, save, i, j, k, pent, poff[256][2];
   char name[128], value[128], camf[0x20000], *pos, *cp, *dp;
   unsigned val, key, type, num, ndim, dim[3];
 
@@ -654,7 +671,7 @@ void parse_foveon()
 	tag, tag >> 8, tag >> 16, tag >> 24, off, len);
     if (get4() != (0x20434553 | (tag << 24))) {
       printf ("Bad Section identifier at %6x\n", off);
-      goto next;
+      return;
     }
     val = get4();
     printf ("version %d.%d, ",val >> 16, val & 0xffff);
@@ -759,7 +776,7 @@ void parse_foveon()
 	get4();
 	printf ("nchars %d\n", get4());
 	off += pent*8 + 24;
-	if (pent > 256) pent=256;
+	if ((unsigned) pent > 256) pent=256;
 	for (i=0; i < pent*2; i++)
 	  poff[0][i] = off + get4()*2;
 	for (i=0; i < pent; i++) {
@@ -772,7 +789,6 @@ void parse_foveon()
 	    strcpy (model, value);
 	}
     }
-next:
     fseek (ifp, save, SEEK_SET);
   }
 }
