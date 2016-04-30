@@ -1,9 +1,11 @@
 Source: dcraw
 Section: graphics
-Priority: extra
-Maintainer: Steve King <debian@invux.com>
+Priority: optional
+Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends: debhelper (>= 9), dh-autoreconf, libjpeg-dev, liblcms2-dev, libjasper-dev
-Standards-Version: 3.9.4
+Standards-Version: 3.9.8
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/dcraw.git
+Vcs-Browser: https://anonscm.debian.org/git/collab-maint/dcraw.git
 Homepage: http://www.cybercom.net/~dcoffin/dcraw/
 
 Package: dcraw
@@ -17,4 +19,3 @@ Description: decode raw digital camera images
  Sigma (see http://www.cybercom.net/~dcoffin/dcraw/ for full list)
  Note: This utility does not read directly from the cameras, only
  the files after they have been downloaded, use gphoto2 for that.
-

@@ -1,3 +1,19 @@
+dcraw (9.26-1) unstable; urgency=medium
+
+  * QA upload.
+  * Setting maintainer to QA.
+  * New upstream version. Closes: #754388, #785019
+  * New upstream version fixes CVE-2015-3885.
+  * Refesh patch remove_LO_line_from_manpage.diff
+  * Update d/copyright and add missing licenses. Closes: #634924
+  * Bump SV to 3.9.8 -- no changes required.
+  * Created git repository on collab-maint.
+  * Include NMU changelogs. Closes: #750858
+  * Change package priority to optional. Closes: #819652
+  * Fix typo in manpage dcparse.1
+
+ -- Tobias Frost <tobi@debian.org>  Sat, 30 Apr 2016 23:26:42 +0200
+
 dcraw (9.21-0.2) unstable; urgency=medium
 
   * Non-maintainer upload.

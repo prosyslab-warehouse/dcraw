@@ -14,8 +14,14 @@ There is also a plugin for the gimp to read raw images directly.
 
  -- Steve King <debian@invux.com>
 
- 
+
 I have replaced this with a new snapshot downloaded on 30th Apr 2013
 Date in package: $Date: 2012/12/23 19:25:36 $
 
  -- Oliver Sander <sander@igpm.rwth-aachen.de>
+
+
+I have replaced this with a new snapshot downloaded on 30th Apr 2016
+Date in package: $Date: 2015/05/25 02:29:14
+
+ -- Tobias Frost <tobi@debian.org>

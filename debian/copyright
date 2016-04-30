@@ -7,26 +7,34 @@ Source:
   http://www.cybercom.net/~dcoffin/dcraw/dcraw.1
 
 Files: *
-Copyright: 1997-2004 by Dave Coffin
-License: GPL-2+
-   dcraw.c -- Dave Coffin's raw photo decoder
-   Copyright 1997-2004 by Dave Coffin, dcoffin a cybercom o net
-   .
+Copyright: 1997-2015 by Dave Coffin
+License: dcraw
+  dcraw.c -- Dave Coffin's raw photo decoder
+   Copyright 1997-2015 by Dave Coffin, dcoffin a cybercom o net
+
    This is a command-line ANSI C program to convert raw photos from
    any digital camera on any computer running any operating system.
-   .
-   Attention!  Some parts of this program are restricted under the
-   terms of the GNU General Public License.  Such code is enclosed
-   in "BEGIN GPL BLOCK" and "END GPL BLOCK" declarations.
-   .
-   All the code currently under GPL is specific to Foveon cameras.
-   This began in Revision 1.237.
-   .
-   To lawfully redistribute dcraw.c, you must either (a) include
-   full source code for all executable files containing restricted
-   functions, (b) remove these functions, re-implement them, or
-   copy them from an earlier, non-GPL Revision of dcraw.c, or (c)
-   purchase a license from the author.
+
+   No license is required to download and use dcraw.c.  However,
+   to lawfully redistribute dcraw, you must either (a) offer, at
+   no extra charge, full source code* for all executable files
+   containing RESTRICTED functions, (b) distribute this code under
+   the GPL Version 2 or later, (c) remove all RESTRICTED functions,
+   re-implement them, or copy them from an earlier, unrestricted
+   Revision of dcraw.c, or (d) purchase a license from the author.
+
+   The functions that process Foveon images have been RESTRICTED
+   since Revision 1.237.  All other code remains free for all uses.
+
+   *If you have not modified dcraw.c in any way, a link to my
+   homepage qualifies as "full source code".
+
+Files: clean_crw.c parse.c rawphoto.c
+Copyright: 2004-2015 by Dave Coffin
+Comment: Website says: Unless otherwise noted in the source code, these
+ programs are free for all uses.
+License: Permissive
+ Free for all uses.
 
 Files: debian/*
 Copyright: Steve King <debian@invux.com>
