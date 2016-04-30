@@ -5,8 +5,8 @@
    This program displays raw metadata for all raw photo formats.
    It is free for all uses.
 
-   $Revision: 1.66 $
-   $Date: 2008/01/19 06:01:47 $
+   $Revision: 1.69 $
+   $Date: 2009/08/28 22:52:20 $
  */
 
 #include <stdio.h>
@@ -239,7 +239,7 @@ void parse_makernote (int base, int level)
     fseek (ifp, -10, SEEK_CUR);
 
   entries = get2();
-  if (entries > 100) return;
+  if (entries > 127) return;
   puts("  MakerNote:");
   while (entries--) {
     save = ftell(ifp);
@@ -247,8 +247,10 @@ void parse_makernote (int base, int level)
     type = get2();
     count= get4();
     tiff_dump (base, tag, type, count, level);
-    if ((tag == 0x11 && !strncmp(make,"NIKON",5)) || type == 13) {
-      fseek (ifp, get4()+base, SEEK_SET);
+    if ((tag      == 0x11 && !strncmp(make,"NIKON",5)) ||
+	(tag >> 8 == 0x20 && !strncmp(buf ,"OLYMP",5)) || type == 13) {
+      if (count == 1)
+	fseek (ifp, get4()+base, SEEK_SET);
       parse_tiff_ifd (base, level+1);
     }
     if (tag == 0x1d)
@@ -262,8 +264,6 @@ void parse_makernote (int base, int level)
       fread (buf98, sizeof buf98, 1, ifp);
     if (tag == 0xa7)
       key = fgetc(ifp)^fgetc(ifp)^fgetc(ifp)^fgetc(ifp);
-    if (!strcmp (buf,"OLYMP") && tag >> 8 == 0x20)
-      parse_tiff_ifd (base, level+1);
     if (tag == 0xe01)
       parse_nikon_capture_note (count);
     if (tag == 0xb028) {
@@ -357,6 +357,7 @@ int parse_tiff_ifd (int base, int level)
       case 29185: sony_length = get4();  break;
       case 29217: sony_key    = get4();  break;
       case 33424:
+      case 65024:
 	puts("Kodak private data:");
 	fseek (ifp, get4()+base, SEEK_SET);
 	parse_tiff_ifd (base, level+1);
@@ -564,7 +565,7 @@ void parse_riff (int level)
     end = ftell(ifp) + size;
     fread (type, 4, 1, ifp);
     printf (" type %.4s:\n", type);
-    while (ftell(ifp) < end)
+    while (ftell(ifp)+7 < end)
       parse_riff (level+1);
   } else {
     save = ftell(ifp);
