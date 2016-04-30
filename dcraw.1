@@ -49,6 +49,12 @@ shows metadata.
 cannot decode JPEG files!!
 .SH REPAIR OPTIONS
 .TP
+.B -I
+Read the raw pixels from standard input in CPU byte order with
+no header.  Use
+.B dcraw -E -4
+to get the raw pixel values.
+.TP
 .B -P deadpixels.txt
 Read the dead pixel list from this file instead of ".badpixels".
 See
@@ -176,7 +182,12 @@ Good for photographing black-and-white documents.
 .B -D
 Same as
 .BR -d ,
-but totally raw (no color scaling).
+but with the original unscaled pixel values.
+.TP
+.B -E
+Same as
+.BR -D ,
+but masked pixels are not cropped.
 .TP
 .B -h
 Output a half-size color image.  Twice as fast as
