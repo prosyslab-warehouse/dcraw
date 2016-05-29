@@ -1,0 +1,7 @@
+
+
+NAME=IMG_0848
+cp debian/tests/${NAME}.CR2 ${ADTTMP}
+cd ${ADTTMP}
+dcraw ${NAME}.CR2
+ppmtojpeg ${NAME}.ppm > ${NAME}.jpeg

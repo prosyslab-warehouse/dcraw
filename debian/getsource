@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# This script builds the upstream tar file for dcraw
+# by downloading sources file by file via http by wget.
+#
+# Run its from outside of repository:
+#
+#   $ bash dcraw/debian/getsource
+#
+# As output, dcraw_X.YY.orig.tar.gz will be created.
+#
 
 PATH=/usr/bin:/bin
 
@@ -13,7 +23,6 @@ http_proxy=
 export http_proxy
 
 TMPFILE=dcraw.c_new
-TEMPLATEDIR=dcraw-template
 
 # Get the new source
 ${WGET} -O ${TMPFILE} ${DCRAWHOME}dcraw.c
@@ -30,18 +39,16 @@ fi
 
 
 # Build a working directory
-WORKDIR=dcraw-${NEWVERSION}
+WORKDIR=dcraw_${NEWVERSION}.orig
 if [ -d ${WORKDIR} ]
 then
-  echo "Working directory for current version already exists. stop"
+    echo "Working directory for current version already exists. stop"
+    echo "dcraw is in newest version already."
   exit 0
 fi
 
-rm -rf ${WORKDIR}
 mkdir ${WORKDIR}
 mv ${TMPFILE} ${WORKDIR}/dcraw.c
-
-cp "${0}" "${WORKDIR}/getsource"
 
 # Get the other bits and pieces
 cd ${WORKDIR}
@@ -56,37 +63,5 @@ ${WGET} ${DCRAWHOME}.badpixels
 
 cd ..
 
-# Build the .orig tar file
-rm -rf ${WORKDIR}.orig
-cp -a ${WORKDIR} ${WORKDIR}.orig
-
-mv ${WORKDIR}/.badpixels ${WORKDIR}/badpixels
-
-#tar -cvzf ${WORKDIR}.orig.tar.gz ${WORKDIR}.orig
-#rm -rf ${WORKDIR}.orig
-
-# Build a template directory with apt-get source
-rm -rf ${TEMPLATEDIR}
-mkdir ${TEMPLATEDIR}
-cd ${TEMPLATEDIR}
-apt-get source dcraw
-cd ..
-
-# Copy in the template debian bits and pieces
-cp -a ${TEMPLATEDIR}/dcraw-*/debian ${WORKDIR}
-#cp -a ${TEMPLATEDIR}/dcraw-*/dcfixdates.1 ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/dcparse.1 ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/Makefile ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/dcfujiturn.1 ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/dcfujiturn16.1 ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/dccleancrw.1 ${WORKDIR}
-cp -a ${TEMPLATEDIR}/dcraw-*/dcfujigreen.1 ${WORKDIR}
-
-# Prep the changelog
-cd ${WORKDIR}
-dch --newversion=${NEWVERSION}-1
-egrep '\$Date: [0-9]{4}/[0-9]+/[0-9]+ [0-9]+:[0-9]+:[0-9]+.*\$$' dcraw.c >> debian/README.Debian
-
-vi debian/README.Debian
-
-dpkg-buildpackage -rfakeroot
+tar -cvzf ${WORKDIR}.tar.gz ${WORKDIR}
+rm -rf ${WORKDIR}

@@ -25,3 +25,15 @@ I have replaced this with a new snapshot downloaded on 30th Apr 2016
 Date in package: $Date: 2015/05/25 02:29:14
 
  -- Tobias Frost <tobi@debian.org>
+
+
+I have replaced this with a new snapshot downloaded on 28th May 2016
+Date in package: $Date: 2016/05/10 21:30:43
+
+Decoding of Red camera movies is unsupported. There are dependence
+on an un-maintained library Jasper which will be no more part of Debian.
+
+Please, be careful. File '.badpixels' is invisible, on first sight,
+(will appears with ls -a) in doc/examples repository.
+
+ -- Filip Hroch <hroch@physics.muni.cz>
