@@ -1,3 +1,23 @@
+dcraw (9.28-1) unstable; urgency=low
+
+  * New upstream version.
+  * Updated to latest Debian standards.
+  * Updated autotools patch.
+  * Added lcms2 library into configure.ac (Ubuntu bug no.1611001).
+  * Added hardening options to debian/rules.
+  * Switch-on high level of optimisation as upstream author recommends.
+  * Removed obsolete --with-autoreconf option in debian/rules.
+  * Fixed the bug CVE-2013-1438: dcraw (multiple vulnerabilities) mostly
+    in JPEG/TIFF write routines. The patch has been applied by hand
+    to reflect latest upstream source code changes. Closes: #721232
+  * Fixed Index overflow in smal_decode_segment() bug. I patched also
+    by hand. No tests performed (no data available). Closes: #864168
+  * Funny false warning: lintian reports "spelling-error-in-binary
+    usr/bin/dcraw Optio Option". The character string is correct
+    designating Pentax Optio cameras.
+
+ -- Filip Hroch <hroch@physics.muni.cz>  Tue, 31 Jul 2018 11:13:05 +0200
+
 dcraw (9.27-1) unstable; urgency=medium
 
   [ Tobias Frost ]
