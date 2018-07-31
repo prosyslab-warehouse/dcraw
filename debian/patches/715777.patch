@@ -1,3 +1,4 @@
+Bugfix #715777.
 --- a/clean_crw.c
 +++ b/clean_crw.c
 @@ -37,6 +37,10 @@

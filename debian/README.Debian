@@ -37,3 +37,13 @@ Please, be careful. File '.badpixels' is invisible, on first sight,
 (will appears with ls -a) in doc/examples repository.
 
  -- Filip Hroch <hroch@physics.muni.cz>
+
+
+I have replaced this with a new snapshot downloaded on 23th July 2018
+Date in package: $Date: 2018/06/01 20:36:25
+
+I applied security patches (see changelog for details). Let me know,
+if the patches will introduce any problems.
+
+ -- Filip Hroch <hroch@physics.muni.cz>
+
