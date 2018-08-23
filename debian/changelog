@@ -1,3 +1,11 @@
+dcraw (9.28-2) unstable; urgency=low
+
+  * Fixed: stack-based buffer overflow bug. Closes: #906529
+  * Fixed: NULL dereference bug. Closes: #906530
+  * Bugfixes has been reported to upstream author Mr. Dave Coffin.
+
+ -- Filip Hroch <hroch@physics.muni.cz>  Thu, 23 Aug 2018 18:07:41 +0200
+
 dcraw (9.28-1) unstable; urgency=low
 
   * New upstream version.
